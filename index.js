@@ -1,50 +1,55 @@
+// server.js
 require('dotenv').config();
 const express = require('express');
-const { ethers } = require('ethers');
-const abi = require('./abi/NFTMusa.json').abi;
+const { JsonRpcProvider, Wallet, Contract } = require('ethers');
+const bodyParser = require('body-parser');
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
-const provider = new ethers.JsonRpcProvider(process.env.AMOY_RPC);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, abi, wallet);
+// Load environment variables
+const RPC_URL = process.env.FOUNDRY_RPC_URL;
+const PRIVATE_KEY = process.env.FOUNDRY_PRIVATE_KEY;
+const NFT_CONTRACT_ADDRESS = process.env.NFT_CONTRACT_ADDRESS;
+const PORT = process.env.PORT || 3000;
 
-// Mint NFT
+// ABI - minimal example, adjust to your contract
+const nftAbi = [
+    "function mintTo(address to, string memory uri) public returns (uint256)",
+    "function tokenURI(uint256 tokenId) view returns (string)"
+];
+
+// Blockchain setup
+const provider = new JsonRpcProvider(RPC_URL);
+const wallet = new Wallet(PRIVATE_KEY, provider);
+
+// Routes
 app.post('/mint', async (req, res) => {
-    const { to, uri } = req.body;
-    try {
-        const tx = await contract.safeMint(to, uri);
-        const receipt = await tx.wait();
-        const event = receipt.logs.find(log => log.fragment?.name === 'Transfer');
-        const tokenId = event?.args?.tokenId.toString();
-        res.json({ success: true, tokenId });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+  const { to, uri, contractAddress } = req.body;
+  if (!to || !uri || !contractAddress) return res.status(400).json({ error: 'Missing to, uri, or contractAddress' });
+
+  try {
+    const nftContract = new Contract(contractAddress, nftAbi, wallet);
+    const tx = await nftContract.mintTo(to, uri);
+    const receipt = await tx.wait();
+    res.json({ txHash: receipt.transactionHash });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Get token URI
-app.get('/token/:id', async (req, res) => {
-    try {
-        const uri = await contract.tokenURI(req.params.id);
-        res.json({ tokenId: req.params.id, uri });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.get('/token-uri/:contractAddress/:tokenId', async (req, res) => {
+  const { contractAddress, tokenId } = req.params;
+  if (!contractAddress || !tokenId) return res.status(400).json({ error: 'Missing contractAddress or tokenId' });
+
+  try {
+    const nftContract = new Contract(contractAddress, nftAbi, wallet);
+    const uri = await nftContract.tokenURI(tokenId);
+    res.json({ tokenId, uri });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Burn NFT
-app.delete('/burn/:id', async (req, res) => {
-    try {
-        const tx = await contract.burn(req.params.id);
-        await tx.wait();
-        res.json({ success: true, tokenId: req.params.id });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
-app.listen(3000, () => {
-    console.log('API server running on http://localhost:3000');
-});
+app.listen(PORT, () => console.log(`NFT API listening on port ${PORT}`));
