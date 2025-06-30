@@ -25,31 +25,34 @@ const wallet = new Wallet(PRIVATE_KEY, provider);
 
 // Routes
 app.post('/mint', async (req, res) => {
-  const { to, uri, contractAddress } = req.body;
-  if (!to || !uri || !contractAddress) return res.status(400).json({ error: 'Missing to, uri, or contractAddress' });
+    const { to, uri, contractAddress } = req.body;
+    if (!to || !uri || !contractAddress) return res.status(400).json({ error: 'Missing to, uri, or contractAddress' });
 
-  try {
-    const nftContract = new Contract(contractAddress, nftAbi, wallet);
-    const tx = await nftContract.mintTo(to, uri);
-    const receipt = await tx.wait();
-    res.json({ txHash: receipt.transactionHash });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const nftContract = new Contract(contractAddress, nftAbi, wallet);
+        const tx = await nftContract.mintTo(to, uri);
+        const receipt = await tx.wait();
+        res.json({ txHash: receipt.transactionHash });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/token-uri/:contractAddress/:tokenId', async (req, res) => {
-  const { contractAddress, tokenId } = req.params;
-  if (!contractAddress || !tokenId) return res.status(400).json({ error: 'Missing contractAddress or tokenId' });
-
-  try {
-    const nftContract = new Contract(contractAddress, nftAbi, wallet);
-    const uri = await nftContract.tokenURI(tokenId);
-    res.json({ tokenId, uri });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    const { contractAddress, tokenId } = req.params;
+    console.log(contractAddress, tokenId);
+    if (!contractAddress || !tokenId)
+        return res.status(400).json({ error: 'Missing contractAddress or tokenId' });
+    
+    try {
+        const nftContract = new Contract(contractAddress, nftAbi, wallet);
+        const uri = await nftContract.tokenURI(tokenId);
+        res.json({ tokenId, uri });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 
 app.listen(PORT, () => console.log(`NFT API listening on port ${PORT}`));
+module.exports = app; // Export for testing purposes

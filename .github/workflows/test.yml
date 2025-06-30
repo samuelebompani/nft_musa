@@ -1,4 +1,4 @@
-name: CI
+name: Blockchain Tests
 
 on:
   push:

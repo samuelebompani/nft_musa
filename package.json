@@ -15,8 +15,13 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "forge test -vvvv"
+    "test": "forge test -vvvv",
+    "test-api": "jest test/api.test.js"
   },
   "author": "Samuele Bompani",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^30.0.3",
+    "supertest": "^7.1.1"
+  }
 }
