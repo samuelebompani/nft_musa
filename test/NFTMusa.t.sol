@@ -4,6 +4,9 @@ pragma solidity ^0.8.27;
 import "forge-std/Test.sol";
 import "../src/NFTMusa.sol";
 
+error OwnableUnauthorizedAccount(address caller);
+error ERC721NonexistentToken(uint256 tokenId);
+
 contract NFTMusaTest is Test {
     NFTMusa public nft;
     address public owner;
@@ -40,7 +43,7 @@ contract NFTMusaTest is Test {
 
     function testOnlyOwnerCanMint() public {
         vm.prank(user1);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, user1));
         nft.safeMint(user1, sampleURI);
     }
 
@@ -53,7 +56,7 @@ contract NFTMusaTest is Test {
         vm.prank(user1);
         nft.burn(tokenId);
 
-        vm.expectRevert("ERC721: invalid token ID");
+        vm.expectRevert(abi.encodeWithSelector(ERC721NonexistentToken.selector, tokenId));
         nft.ownerOf(tokenId);
     }
 }
