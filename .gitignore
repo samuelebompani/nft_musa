@@ -12,3 +12,16 @@ docs/
 
 # Dotenv file
 .env
+
+#Notes
+notes.txt
+commands*
+
+# Flat versions
+Flat*
+
+bin/
+
+# NPM
+node_modules/
+package-lock.json

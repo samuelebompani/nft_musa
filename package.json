@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "ethers": "^6.14.4",
+    "express": "^5.1.0"
+  },
+  "name": "nft_musa",
+  "version": "1.0.0",
+  "description": "**Apis for the project NFT Musa.**",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "forge test -vvvv"
+  },
+  "author": "Samuele Bompani",
+  "license": "MIT"
+}
