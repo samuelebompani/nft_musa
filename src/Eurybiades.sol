@@ -10,34 +10,24 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Eurybiades is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     uint256 private _nextTokenId;
 
-    constructor(address initialOwner)
-        ERC721("Eurybiades", "EURBD")
-        Ownable(initialOwner)
-    {}
+    constructor() ERC721("Eurybiades", "EURBD") Ownable(msg.sender) {}
 
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, "https://salmon-absolute-fowl-465.mypinata.cloud/ipfs/Qmbsc586u3DkhwFhoSjLqttia9bRWvY9oBZLnREhZ8y2vk");
+        _setTokenURI(
+            tokenId,
+            "https://salmon-absolute-fowl-465.mypinata.cloud/ipfs/Qmbsc586u3DkhwFhoSjLqttia9bRWvY9oBZLnREhZ8y2vk"
+        );
     }
 
     // The following functions are overrides required by Solidity.
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

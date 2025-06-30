@@ -10,10 +10,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract NFTMusa is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     uint256 private _nextTokenId;
 
-    constructor()
-        ERC721("NFTMusa", "NMS")
-        Ownable(msg.sender)
-    {}
+    constructor() ERC721("NFTMusa", "NMS") Ownable(msg.sender) {}
 
     function safeMint(address to, string memory uri) public onlyOwner returns (uint256) {
         uint256 tokenId = _nextTokenId++;
